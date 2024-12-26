@@ -12,6 +12,10 @@
   .button{
     max-width: 200px;
     width: 100%;
+    background-color: #1677ff;
+    border-radius: 5px;
+    border: none;
+    color: white;
   }
   .select{
     max-width: 200px;

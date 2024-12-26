@@ -1,5 +1,5 @@
 import React from 'react';
-import { Upload, Button, message } from 'antd';
+import { Upload, Button, message, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import styles from './FileUpload.module.css'; 
 
@@ -36,17 +36,17 @@ const FileUpload = () => {
 
      
       <div className={styles.buttonContainer}> 
-        <select className={styles.select} id="bank">
+        <Select className={styles.select} id="bank">
           <option value="bank1">Банк 1</option>
           <option value="bank2">Банк 2</option>
           <option value="bank3">Банк 3</option>
-        </select>
+        </Select>
 
-        <select className={styles.select} id="out-format">
+        <Select className={styles.select} defaultValue='format1' id="out-format">
           <option value="format1">Формат 1</option>
           <option value="format2">Формат 2</option>
           <option value="format3">Формат 3</option>
-        </select>
+        </Select>
 
         <Button className={styles.button}  type="primary" id="parse">Parse</Button>
       </div>
