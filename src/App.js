@@ -1,14 +1,13 @@
-import logo from './logo.svg';
-import './App.css';
-import React from 'react';
-import FileUpload from './FileUpload';
+import "./App.css";
+import React from "react";
+import FileUpload from "./FileUpload";
 
 function App() {
-  return (
-    <div className="App">
-      <FileUpload />
-    </div>
-  );
+	return (
+		<div className="App">
+			<FileUpload />
+		</div>
+	);
 }
 
 export default App;
