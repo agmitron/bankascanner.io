@@ -1,22 +1,76 @@
-.buttonContainer {
-	max-width: 650px;
+.uploadContainer {
+	max-width: 1184px;
 	width: 100%;
 	margin: 0 auto;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	margin-top: 30px;
+	/* min-height: 293px; */
+	background-color: #FFFFFF;
+	
+	padding: 20px;
+	margin-top: 20px;
 }
-.button {
-	max-width: 200px;
-	width: 100%;
-	background-color: #1677ff;
-	border-radius: 5px;
-	border: none;
+
+.AppHeader {
+	background-color: #282c34;
 	color: white;
-}
-.select {
-	max-width: 200px;
+	font-size: 18px;
+	font-weight: 700;
 	width: 100%;
-	border-radius: 5px;
 }
+.headerContainer {
+	padding: 16px;
+	display: flex;
+    flex-direction: row;
+	justify-content: space-between;
+}
+.AppMain {
+	margin-top: 136px;
+	margin-bottom: 184px;
+}
+.uploadArea {
+	max-width: 1014px;
+	width: 100%;
+	margin: 0 auto;
+	min-height: 293px;
+	background-color: #F0F5FF;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 20px;
+	margin-top: 20px;
+  }
+  .title {
+	text-align: start;
+	font-size: 21px;
+	font-weight: 300;
+	border-bottom: 1px solid #F0F0F0;
+	margin: 0;
+	padding: 16px 0 16px 0;
+  }
+  .steps {
+	max-width: 802px;
+	width: 100%;
+	margin: 0 auto;
+	
+  }
+  .upload-text {
+	text-align: center;
+	color: #999;
+	font-size: 16px;
+  }
+  .selectContainer {
+	display: flex;
+	max-width: 354px;
+	width: 100%;
+	justify-content: space-between;
+	margin: 0 auto;
+	margin-top: 20px;
+  }
+  .buttonContainer {
+	display: flex;
+	max-width: 221px;
+	width: 100%;
+	justify-content: space-between;
+	margin: 0 auto;
+	margin-top: 20px;
+  }
+  
