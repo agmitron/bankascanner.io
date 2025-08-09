@@ -18,9 +18,16 @@ const FileUpload: React.FC = () => {
 };
 const supportedBanks = scanner.choices(scanners);
 
-  // const handleChange = (info: any) => {
-  //   setFileList(info.fileList);
-  // };
+const getSupportedVersions = (bank: string | null): string[] => {
+  if (!bank) return [];
+  const versioner = (scanners as Record<string, any>)[bank];
+  if (!versioner) return [];
+  return (versioner.supported ?? []) as string[];
+};
+
+  const handleChange = (info: any) => {
+    setFileList(info.fileList);
+  };
 
   const handleContinue = () => {
     if (fileList.length === 0) {
@@ -44,7 +51,9 @@ const supportedBanks = scanner.choices(scanners);
         }
 
         // Обработка документа
-        const result = scanner.run(selectedBank, selectedVersion, statementResult, scanners);
+        const bank = selectedBank as string;
+        const version = selectedVersion as string;
+        const result = scanner.run(bank, version, { content: statementResult }, scanners);
 
         // Обработка результата
         for (const attempt of result) {
@@ -78,6 +87,7 @@ const supportedBanks = scanner.choices(scanners);
         name: file.name,
         status: 'done',
         url: URL.createObjectURL(file),
+        originFileObj: file,
       };
       newFileList.push(newFile);
       message.success(`${file.name} файл добавлен`);
@@ -125,9 +135,15 @@ const supportedBanks = scanner.choices(scanners);
 
       {current === 0 && (
         <div className={styles.selectContainer}>
-          <Select
+                  <Select
                     placeholder="Сhoose bank"
-                    onChange={(value) => setSelectedBank(value)}
+                    value={selectedBank ?? undefined}
+                    onChange={(value: string) => {
+                      setSelectedBank(value);
+                      const versions = getSupportedVersions(value);
+                      const defaultVersion = versions.find(v => v === 'latest') ?? versions[0] ?? null;
+                      setSelectedVersion(defaultVersion);
+                    }}
                     style={{ width: 128 }}
                   >
                    {supportedBanks.map((bank) => (
@@ -139,12 +155,16 @@ const supportedBanks = scanner.choices(scanners);
                   </Select>
                   <Select
                     placeholder="Version"
-                    onChange={(value) => setSelectedVersion(value)}
-                    style={{ width: 98 }}
+                    value={selectedVersion ?? undefined}
+                    disabled={!selectedBank}
+                    onChange={(value: string) => setSelectedVersion(value)}
+                    style={{ width: 128 }}
                   >
-                    <Option value="1.0">Версия 1.0</Option>
-                    <Option value="1.1">Версия 1.1</Option>
-                    
+                    {getSupportedVersions(selectedBank).map((v) => (
+                      <Option key={v} value={v}>
+                        {v}
+                      </Option>
+                    ))}
                   </Select>
         <Button type="primary" onClick={handleContinue}>
           Continue
