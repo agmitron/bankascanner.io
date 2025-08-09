@@ -1,0 +1,50 @@
+{
+  "app": {
+    "title": {
+      "upload": "Upload your file and choose settings",
+      "scan": "Your statement is scanned. Review the result in the table below",
+      "export": "Choose your preferred format"
+    },
+    "header": {
+      "brand": "Bankascanner",
+      "helpAlt": "Help"
+    },
+    "steps": {
+      "upload": "Upload",
+      "scan": "Scan",
+      "export": "Export"
+    },
+    "upload": {
+      "hint": "Drop your file here or click to choose (PDF only)",
+      "button": {
+        "continue": "Continue",
+        "previous": "Previous Page",
+        "download": "Download"
+      },
+      "select": {
+        "bank": "Choose bank",
+        "version": "Version",
+        "format": "Choose format"
+      },
+      "messages": {
+        "noFile": "Please upload a document.",
+        "chooseBankVersion": "Please choose a bank and version.",
+        "processing": "Processing document...",
+        "done": "Upload completed!",
+        "invalidContent": "The uploaded file content is invalid or empty."
+      }
+    },
+    "language": {
+      "en": "English",
+      "ru": "Russian"
+    },
+    "log": {
+      "success": "Successfully parsed:",
+      "failure": "Failed to parse:"
+    },
+    "formats": {
+      "csv": "CSV",
+      "json": "JSON"
+    }
+  }
+}
