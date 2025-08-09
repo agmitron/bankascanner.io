@@ -75,26 +75,7 @@ const getSupportedVersions = (bank: string | null): string[] => {
     reader.readAsText(file); // Читаем файл как текст
     setCurrent(current + 1); // Переход на следующий шаг
 };
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const files = e.dataTransfer.files;
-    const newFileList = [...fileList];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const newFile = {
-        uid: file.name,
-        name: file.name,
-        status: 'done',
-        url: URL.createObjectURL(file),
-        originFileObj: file,
-      };
-      newFileList.push(newFile);
-      message.success(`${file.name} файл добавлен`);
-    }
-
-    setFileList(newFileList);
-  };
+  // Drag-and-click upload handled via Ant Design Upload.Dragger
   return (
     
     <div>
@@ -111,23 +92,22 @@ const getSupportedVersions = (bank: string | null): string[] => {
 <h1 className={styles.title} >{current === 0 && 'Upload your file and choose settings' }
 {current === 1 && 'Your statement is scanned. Review the result in the table below' }
 {current === 2 && 'Choose your prefer format' }</h1></div>
-      <div 
-        className={styles.uploadArea} 
-        onDrop={handleDrop} // Переместили onDrop сюда
-        onDragOver={(e) => e.preventDefault()} // Предотвращаем стандартное поведение
-       
-      >
+      <div className={styles.uploadArea}>
         {current === 0 && (
-          <Upload
+          <Upload.Dragger
             accept=".pdf"
+            multiple={false}
+            maxCount={1}
             fileList={fileList}
             onChange={handleChange}
-            beforeUpload={() => false} 
+            beforeUpload={() => false}
+            openFileDialogOnClick
+            style={{ background: 'transparent', border: 'none' }}
           >
             <div className={styles.uploadText}>
-              Drop down your file (Supported format: .pdf)
+              Drop your file here or click to choose (PDF only)
             </div>
-          </Upload>
+          </Upload.Dragger>
         )}
         {current === 1 && <h3>Обработка документа...</h3>}
         {current === 2 && <h3>Загрузка завершена!</h3>}
