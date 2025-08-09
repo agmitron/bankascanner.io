@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Upload, Steps, Button, message, Select, Table } from 'antd';
 import QuestionCircle from './QuestionCircle.svg';
 import styles from './FileUpload.module.css';
-import { scanner } from 'bankascanner';
+import * as scanner from '../node_modules/bankascanner/dist/scanner/index.js';
 import { useTranslation } from './i18n';
 
 const { Step } = Steps;
@@ -187,7 +187,7 @@ const getSupportedVersions = (bank: string | null): string[] => {
                     
                   </Select><Button type="primary" onClick={async () => {
                     if (!scanResult) return;
-                    const { exporter } = await import('bankascanner');
+                    const exporter = await import('../node_modules/bankascanner/dist/exporter/index.js');
                     const scanIterable = (function*(){
                       for (const a of scanResult as any[]) yield a;
                     })();
