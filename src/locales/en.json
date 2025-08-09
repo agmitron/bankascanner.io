@@ -5,6 +5,13 @@
       "scan": "Your statement is scanned. Review the result in the table below",
       "export": "Choose your preferred format"
     },
+    "table": {
+      "date": "Date",
+      "comment": "Comment",
+      "value": "Value",
+      "currency": "Currency",
+      "category": "Category"
+    },
     "header": {
       "brand": "Bankascanner",
       "helpAlt": "Help"
