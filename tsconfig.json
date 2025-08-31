@@ -1,16 +1,9 @@
 {
   "compilerOptions": {
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src"
-    ],
+    "typeRoots": ["./node_modules/@types", "./src"],
     "target": "es5",
     "downlevelIteration": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -24,8 +17,5 @@
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "src",
-    "global.d.ts"
-  ]
+  "include": ["src", "global.d.ts"]
 }
