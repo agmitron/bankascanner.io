@@ -1,18 +1,21 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import type React from 'react';
+import { createContext, useContext, useMemo, useState, useCallback } from 'react';
 import en from '../locales/en.json';
 import ru from '../locales/ru.json';
 
 type Language = 'en' | 'ru';
 
-type Messages = Record<string, any>;
+type Messages = Record<string, unknown>;
 
 const MESSAGES: Record<Language, Messages> = {
   en,
   ru,
 };
 
-function get(obj: Messages, path: string): string | undefined {
-  return path.split('.').reduce<any>((acc, key) => (acc && acc[key] != null ? acc[key] : undefined), obj);
+function get(obj: Messages, path: string): unknown {
+  return path
+    .split('.')
+    .reduce<unknown>((acc, key) => (typeof acc === 'object' && acc !== null ? (acc as Record<string, unknown>)[key] : undefined), obj);
 }
 
 function detectInitialLanguage(): Language {
@@ -33,12 +36,12 @@ const I18nContext = createContext<I18nApi | null>(null);
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [lang, setLangState] = useState<Language>(detectInitialLanguage());
 
-  const setLang = (l: Language) => {
+  const setLang = useCallback((l: Language) => {
     setLangState(l);
     try {
       localStorage.setItem('lang', l);
     } catch {}
-  };
+  }, []);
 
   const api = useMemo<I18nApi>(() => ({
     lang,
@@ -50,7 +53,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (typeof inEn === 'string') return inEn;
       return key;
     },
-  }), [lang]);
+  }), [lang, setLang]);
 
   return <I18nContext.Provider value={api}>{children}</I18nContext.Provider>;
 };

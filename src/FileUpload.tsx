@@ -1,69 +1,87 @@
-import React, { useMemo, useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import { Upload, Steps, Button, message, Select, Table } from "antd";
+import type { UploadChangeParam, UploadFile } from "antd/es/upload/interface";
+import type { ColumnsType } from "antd/es/table";
 import QuestionCircle from "./QuestionCircle.svg";
 import styles from "./FileUpload.module.css";
 import { useTranslation } from "./i18n";
+import {
+        load as loadImporter,
+        getSupportedBanks,
+        getSupportedVersions,
+        type Bank,
+        type Outcome,
+        type ScanSuccess,
+} from "./load";
 
 const { Step } = Steps;
 const { Option } = Select;
 const FileUpload: React.FC = () => {
-	const { t, lang, setLang } = useTranslation();
-	const [current, setCurrent] = useState(0);
-	const [fileList] = useState<any[]>([]);
-	const [selectedBank, setSelectedBank] = useState<string | null>(null);
-	const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
-	const [scanResult, setScanResult] = useState<any[] | null>(null);
-	const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
+        const { t, lang, setLang } = useTranslation();
+        const [current, setCurrent] = useState(0);
+        const [fileList, setFileList] = useState<UploadFile[]>([]);
+        const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+        const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
+        const [scanResult, setScanResult] = useState<Outcome[] | null>(null);
+        const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
+        const supportedBanks = getSupportedBanks();
+
+        const handleChange = ({ fileList: newFileList }: UploadChangeParam<UploadFile>) => {
+                setFileList(newFileList.slice(-1));
+        };
 
 	const handleContinue = () => {
 		if (fileList.length === 0) {
 			message.error(t("app.upload.messages.noFile"));
 			return;
 		}
-		if (!selectedBank || !selectedVersion) {
-			message.error(t("app.upload.messages.chooseBankVersion"));
-			return;
-		}
+                if (!selectedBank) {
+                        message.error(t("app.upload.messages.chooseBankVersion"));
+                        return;
+                }
 
-		const file = fileList[0].originFileObj; // Получаем оригинальный файл
-		const reader = new FileReader();
-		reader.onload = async (e) => {
-			const statementResult = e.target?.result; // Содержимое файла
+                const file = fileList[0].originFileObj;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                        const statementResult = e.target?.result;
 
-			// Проверяем, что statementResult является строкой
-			if (typeof statementResult !== "string") {
-				console.error(t("app.upload.messages.invalidContent"));
-				return;
-			}
+                        if (!(statementResult instanceof ArrayBuffer)) {
+                                console.error(t("app.upload.messages.invalidContent"));
+                                return;
+                        }
 
-			// Обработка документа
-			const bank = selectedBank as string;
-			const version = selectedVersion as string;
-			const scan = scanner.run(
-				bank,
-				version,
-				{ content: statementResult },
-				scanners,
-			);
-			const attempts = Array.from(scan as Iterable<any>);
-			setScanResult(attempts);
-			attempts.forEach((attempt: any) => {
-				if (attempt.isRight()) {
-					console.log(t("app.log.success"), attempt.value.operation);
-				} else {
-					const failure = attempt.value;
-					console.error(t("app.log.failure"), {
-						text: failure.piece,
-						field: failure.field,
-						reason: failure.reason,
-					});
-				}
-			});
-		};
+                        try {
+                                const impl = await loadImporter(selectedBank);
+                                const result = await impl.run(new Uint8Array(statementResult));
+                                if (result.isLeft()) {
+                                        message.error(result.value);
+                                        return;
+                                }
 
-		reader.readAsText(file); // Читаем файл как текст
-		setCurrent(1); // Go to Scan step
-	};
+                                setScanResult(result.value);
+                                for (const outcome of result.value) {
+                                        if (outcome.isRight()) {
+                                                console.log(
+                                                        t("app.log.success"),
+                                                        outcome.value,
+                                                );
+                                        } else {
+                                                console.error(
+                                                        t("app.log.failure"),
+                                                        outcome.value.message,
+                                                );
+                                        }
+                                }
+                        } catch (err) {
+                                console.error(err);
+                                message.error(String(err));
+                        }
+                };
+
+                reader.readAsArrayBuffer(file);
+                setCurrent(1);
+        };
 	// Drag-and-click upload handled via Ant Design Upload.Dragger
 	return (
 		<div>
@@ -113,7 +131,7 @@ const FileUpload: React.FC = () => {
 								<div className={styles.uploadText}>{t("app.upload.hint")}</div>
 							</Upload.Dragger>
 						)}
-						{current === 1 && <ScanTable t={t} scanResult={scanResult} />}
+                                                {current === 1 && <ScanTable t={t} scanResult={scanResult} />}
 						{current === 2 && <h3>{t("app.title.export")}</h3>}
 					</div>
 
@@ -122,9 +140,11 @@ const FileUpload: React.FC = () => {
 							<Select
 								placeholder={t("app.upload.select.bank")}
 								value={selectedBank ?? undefined}
-								onChange={(value: string) => {
-									setSelectedBank(value);
-									const versions = getSupportedVersions(value);
+                                                                onChange={(value: string) => {
+                                                                        setSelectedBank(value as Bank);
+                                                                        const versions = getSupportedVersions(
+                                                                                value as Bank,
+                                                                        );
 									const defaultVersion =
 										versions.find((v) => v === "latest") ?? versions[0] ?? null;
 									setSelectedVersion(defaultVersion);
@@ -145,12 +165,15 @@ const FileUpload: React.FC = () => {
 								onChange={(value: string) => setSelectedVersion(value)}
 								style={{ width: 128 }}
 							>
-								{getSupportedVersions(selectedBank).map((v) => (
-									<Option key={v} value={v}>
-										{v}
-									</Option>
-								))}
-							</Select>
+                                                                {(selectedBank
+                                                                        ? getSupportedVersions(selectedBank)
+                                                                        : []
+                                                                ).map((v) => (
+                                                                        <Option key={v} value={v}>
+                                                                                {v}
+                                                                        </Option>
+                                                                ))}
+                                                        </Select>
 							<Button type="primary" onClick={handleContinue}>
 								{t("app.upload.button.continue")}
 							</Button>
@@ -185,18 +208,18 @@ const FileUpload: React.FC = () => {
 								type="primary"
 								onClick={async () => {
 									if (!scanResult) return;
-									const exporter = await import(
-										"../node_modules/bankascanner/dist/exporter/index.js"
-									);
-									const scanIterable = (function* () {
-										for (const a of scanResult as any[]) yield a;
-									})();
+                                                                        const exporter = await import(
+                                                                                "bankascanner/exporter",
+                                                                        );
+                                                                        const scanIterable = (function* () {
+                                                                                for (const a of scanResult) yield a;
+                                                                        })();
 									const currentFormat: "json" | "csv" = exportFormat;
-									const stream = exporter.run(
-										scanIterable as any,
-										"",
-										currentFormat,
-									);
+                                                                        const stream = exporter.run(
+                                                                                scanIterable as unknown as Iterable<unknown>,
+                                                                                "",
+                                                                                currentFormat,
+                                                                        );
 									const reader = stream.getReader();
 									const chunks: Uint8Array[] = [];
 									while (true) {
@@ -230,44 +253,39 @@ const FileUpload: React.FC = () => {
 export default FileUpload;
 
 const ScanTable: React.FC<{
-	t: (k: string) => string;
-	scanResult: any[] | null;
+        t: (k: string) => string;
+        scanResult: Outcome[] | null;
 }> = ({ t, scanResult }) => {
-	const data = useMemo(() => {
-		if (!scanResult) return [];
-		return scanResult
-			.filter((a: any) => a?.isRight?.())
-			.map((a: any, idx: number) => ({
-				key: idx,
-				date: a.value.operation.date,
-				comment: a.value.operation.comment,
-				value: a.value.operation.value,
-				currency: a.value.operation.currency,
-				category: a.value.operation.category,
-			}));
-	}, [scanResult]);
+        type TableRow = { key: number } & ScanSuccess;
 
-	const columns = [
-		{
-			title: t("app.table.date"),
-			dataIndex: "date",
-			key: "date",
-			render: (d: Date) => new Date(d).toLocaleDateString(),
-		},
-		{ title: t("app.table.comment"), dataIndex: "comment", key: "comment" },
-		{ title: t("app.table.value"), dataIndex: "value", key: "value" },
-		{ title: t("app.table.currency"), dataIndex: "currency", key: "currency" },
-		{ title: t("app.table.category"), dataIndex: "category", key: "category" },
-	];
+        const data = useMemo<TableRow[]>(() => {
+                if (!scanResult) return [];
+                return scanResult
+                        .filter((a): a is Outcome & { value: ScanSuccess } => a.isRight())
+                        .map((a, idx) => ({ key: idx, ...a.value }));
+        }, [scanResult]);
 
-	return (
-		<div>
-			<h3>{t("app.title.scan")}</h3>
-			<Table
-				dataSource={data}
-				columns={columns as any}
-				pagination={{ pageSize: 10 }}
-			/>
-		</div>
-	);
+        const columns: ColumnsType<TableRow> = [
+                {
+                        title: t("app.table.date"),
+                        dataIndex: "date",
+                        key: "date",
+                        render: (d: string) => new Date(d).toLocaleDateString(),
+                },
+                { title: t("app.table.comment"), dataIndex: "comment", key: "comment" },
+                { title: t("app.table.value"), dataIndex: "value", key: "value" },
+                { title: t("app.table.currency"), dataIndex: "currency", key: "currency" },
+                { title: t("app.table.category"), dataIndex: "category", key: "category" },
+        ];
+
+        return (
+                <div>
+                        <h3>{t("app.title.scan")}</h3>
+                        <Table<TableRow>
+                                dataSource={data}
+                                columns={columns}
+                                pagination={{ pageSize: 10 }}
+                        />
+                </div>
+        );
 };
