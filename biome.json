@@ -24,7 +24,8 @@
 				"useLiteralKeys": "off"
 			},
 			"style": {
-				"noUnusedTemplateLiteral": "off"
+				"noUnusedTemplateLiteral": "off",
+				"useEnumInitializers": "off"
 			}
 		}
 	},

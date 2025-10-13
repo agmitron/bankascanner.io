@@ -4,7 +4,7 @@
       "./node_modules/@types",
       "./src"
     ],
-    "target": "es5",
+    "target": "es2015",
     "lib": [
       "dom",
       "dom.iterable",

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { Upload, Steps, Button, message, Select } from "antd";
 import QuestionCircle from "./QuestionCircle.svg";
 import styles from "./FileUpload.module.css";
