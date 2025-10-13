@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { observer } from "mobx-react-lite";
-import styles from "../../FileUpload.module.css";
+import styles from "./Review.module.css";
 import store from "./Pipeline.store";
 
 const Review = observer(() => (

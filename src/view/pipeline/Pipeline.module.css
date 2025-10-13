@@ -1,0 +1,34 @@
+.AppHeader {
+	background-color: #282c34;
+	color: white;
+	font-size: 18px;
+	font-weight: 700;
+	width: 100%;
+}
+
+.headerContainer {
+	padding: 16px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.AppMain {
+	margin-top: 136px;
+	margin-bottom: 184px;
+}
+
+.steps {
+	max-width: 802px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.uploadContainer {
+	max-width: 1184px;
+	width: 100%;
+	margin: 0 auto;
+	background-color: #ffffff;
+	padding: 20px;
+	margin-top: 20px;
+}

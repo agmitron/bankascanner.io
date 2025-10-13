@@ -4,7 +4,6 @@ import type { UploadChangeParam } from "antd/es/upload";
 import type { UploadFile } from "antd/es/upload/interface";
 import { Upload, Steps, Button, message, Select } from "antd";
 import QuestionCircle from "./QuestionCircle.svg";
-import styles from "./FileUpload.module.css";
 
 const { Step } = Steps;
 const { Option } = Select;

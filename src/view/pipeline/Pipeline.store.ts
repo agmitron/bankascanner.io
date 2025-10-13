@@ -1,38 +1,22 @@
-import type { UploadFile } from "antd/es/upload/interface";
-import { makeAutoObservable } from "mobx";
+import { action, observable } from "mobx";
 import { Step } from "./common";
 
 class PipelineStore {
-	step = Step.Import;
-	fileList: UploadFile[] = [];
-	selectedBank?: string;
-	selectedVersion?: string;
+	@observable accessor step = Step.Import;
 
-	constructor() {
-		makeAutoObservable(this, {}, { autoBind: true });
-	}
-
-	setFileList(fileList: UploadFile[]) {
-		this.fileList = fileList;
-	}
-
-	setSelectedBank(bank?: string) {
-		this.selectedBank = bank;
-	}
-
-	setSelectedVersion(version?: string) {
-		this.selectedVersion = version;
-	}
-
+	@action
 	next() {
-		if (this.step < Step.Export) {
-			this.step += 1;
+		const next = this.step + 1;
+		if (next < Object.keys(Step).length) {
+			this.step = next;
 		}
 	}
 
+	@action
 	previous() {
-		if (this.step > Step.Import) {
-			this.step -= 1;
+		const previous = this.step - 1;
+		if (previous > 0) {
+			this.step--;
 		}
 	}
 }

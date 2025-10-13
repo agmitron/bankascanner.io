@@ -1,0 +1,21 @@
+.uploadArea {
+	max-width: 1014px;
+	width: 100%;
+	margin: 0 auto;
+	min-height: 293px;
+	background-color: #f0f5ff;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 20px;
+	margin-top: 20px;
+}
+
+.buttonContainer {
+	display: flex;
+	max-width: 221px;
+	width: 100%;
+	justify-content: space-between;
+	margin: 0 auto;
+	margin-top: 20px;
+}

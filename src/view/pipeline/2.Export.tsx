@@ -1,6 +1,6 @@
 import { Button, Select } from "antd";
 import { observer } from "mobx-react-lite";
-import styles from "../../FileUpload.module.css";
+import styles from "./Export.module.css";
 import store from "./Pipeline.store";
 
 const { Option } = Select;
