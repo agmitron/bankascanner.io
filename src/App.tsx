@@ -1,11 +1,11 @@
 import "./App.css";
 import React from "react";
-import FileUpload from "./FileUpload";
+import Pipeline from "./view/pipeline/Pipeline";
 
 function App() {
 	return (
 		<div className="App">
-			<FileUpload />
+			<Pipeline />
 		</div>
 	);
 }

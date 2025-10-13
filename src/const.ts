@@ -1,5 +1,5 @@
-import * as importer from "bankascanner/importer";
-import * as exporter from "bankascanner/exporter";
+import type * as importer from "bankascanner/importer";
+import type * as exporter from "bankascanner/exporter";
 
 type Loader<D> = () => Promise<D>;
 

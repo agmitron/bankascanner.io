@@ -1,32 +1,54 @@
-import { Button, Flex, Steps } from "antd";
+import { Steps } from "antd";
+import { observer } from "mobx-react-lite";
+import QuestionCircle from "../../QuestionCircle.svg";
+import styles from "../../FileUpload.module.css";
+import Import from "./1.Import";
+import Export from "./2.Export";
+import Review from "./3.Review";
 import { Step } from "./common";
 import store from "./Pipeline.store";
 
-const steps: Record<Step, () => React.JSX.Element> = {
-	[Step.Import]: () => <></>,
-	[Step.Review]: () => <></>,
-	[Step.Export]: () => <></>,
+const stepComponents: Record<Step, () => React.JSX.Element> = {
+	[Step.Import]: Import,
+	[Step.Review]: Review,
+	[Step.Export]: Export,
 };
 
-const Pipeline = () => {
-	const Current = steps[store.step];
+const stepTitles: Record<Step, string> = {
+	[Step.Import]: "Upload your file and choose settings",
+	[Step.Review]: "Your statement is scanned. Review the result in the table below",
+	[Step.Export]: "Choose your prefer format",
+};
+
+const Pipeline = observer(() => {
+	const CurrentStep = stepComponents[store.step];
 
 	return (
-		<Flex vertical>
-			<Steps>
-				<Steps.Step title="Import" />
-				<Steps.Step title="Review" />
-				<Steps.Step title="Export" />
-			</Steps>
+		<div>
+			<header className={styles.AppHeader}>
+				<div className={styles.headerContainer}>
+					<span>Bankascanner</span>
+					<img alt="question" src={QuestionCircle} />
+				</div>
+			</header>
 
-			<Current />
+			<main className={styles.AppMain}>
+				<Steps className={styles.steps} current={store.step}>
+					<Steps.Step title="Upload" />
+					<Steps.Step title="Scan" />
+					<Steps.Step title="Export" />
+				</Steps>
 
-			<Flex>
-				<Button>Previous</Button>
-				<Button>Next</Button>
-			</Flex>
-		</Flex>
+				<div className={styles.uploadContainer}>
+					<div>
+						<h1 className={styles.title}>{stepTitles[store.step]}</h1>
+					</div>
+
+					<CurrentStep />
+				</div>
+			</main>
+		</div>
 	);
-};
+});
 
 export default Pipeline;
