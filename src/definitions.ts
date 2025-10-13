@@ -1,7 +1,14 @@
 import type * as importer from "bankascanner/importer";
 import type * as exporter from "bankascanner/exporter";
 
+export type Bank = keyof typeof importers;
+export type Format = keyof typeof exporters;
+
 type Loader<D> = () => Promise<D>;
+
+function load<D>(url: string): Loader<D> {
+	return () => import(url);
+}
 
 export const importers: Record<string, Loader<importer.Definition>> = {
 	tbank: load("https://agmitron.github.io/bankascanner/tbank/tbank.js"),
@@ -11,7 +18,3 @@ export const importers: Record<string, Loader<importer.Definition>> = {
 export const exporters: Record<string, Loader<exporter.Definition>> = {
 	json: load("bankascanner/exporter/json"),
 };
-
-function load<D>(url: string): Loader<D> {
-	return () => import(url);
-}

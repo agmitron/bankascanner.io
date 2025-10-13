@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -12,15 +13,24 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "allowSyntheticDefaultImports": true
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
   "include": [
     "src",
+    "src/vite-env.d.ts",
     "global.d.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
   ]
 }

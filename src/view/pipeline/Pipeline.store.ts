@@ -1,8 +1,10 @@
 import { action, observable } from "mobx";
 import { Step } from "./common";
+import type { Bank } from "~/definitions";
 
 class PipelineStore {
 	@observable accessor step = Step.Import;
+	@observable accessor bank: Bank | null = null;
 
 	@action
 	next() {

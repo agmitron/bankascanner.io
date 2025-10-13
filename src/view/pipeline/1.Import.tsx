@@ -1,9 +1,6 @@
-import type { DragEventHandler } from "react";
-import { Button, Select, Upload, message } from "antd";
-import type { UploadChangeParam } from "antd/es/upload";
-import type { UploadFile } from "antd/es/upload/interface";
+import { Button, Select, Upload } from "antd";
 import { observer } from "mobx-react-lite";
-import { importers } from "../../const";
+import { importers } from "~/definitions";
 import styles from "./Import.module.css";
 import store from "./Pipeline.store";
 
@@ -50,7 +47,7 @@ const Import = observer(() => (
 				<Option value="1.1">Версия 1.1</Option>
 			</Select>
 
-			<Button type="primary" onClick={() => console.log("continue")}>
+			<Button type="primary" onClick={() => store.next()}>
 				Continue
 			</Button>
 		</div>
