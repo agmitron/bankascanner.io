@@ -1,4 +1,4 @@
-import { Button, Select, Upload } from "antd";
+import { Alert, Button, Select, Upload } from "antd";
 import type { UploadProps } from "antd";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
@@ -47,6 +47,7 @@ const Import = observer(() => {
 					beforeUpload={() => false}
 					onChange={handleUploadChange}
 					disabled={isLoadingFile}
+					maxCount={1}
 				>
 					<div className={styles.uploadText}>
 						{isLoadingFile
@@ -55,6 +56,15 @@ const Import = observer(() => {
 					</div>
 				</Upload>
 			</div>
+
+			{store.error && (
+				<Alert
+					type="error"
+					message={store.error}
+					showIcon
+					className={styles.errorAlert}
+				/>
+			)}
 
 			<div className={styles.selectContainer}>
 				<Select

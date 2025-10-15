@@ -30,15 +30,21 @@ class PipelineStore {
 	@action
 	upload(file: Uint8Array) {
 		this.file = file;
+		this.error = null;
+		this.result = null;
 	}
 
 	@action
 	setBank(b: Bank) {
 		this.bank = b;
+		this.error = null;
+		this.result = null;
 	}
 
 	@action
 	async scan() {
+		this.error = null;
+
 		if (!this.bank) {
 			throw new Error(
 				"Bank is not set. You accessed this action at the wrong stage.",

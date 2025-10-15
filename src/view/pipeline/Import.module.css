@@ -25,3 +25,8 @@
 	margin: 0 auto;
 	margin-top: 20px;
 }
+
+.errorAlert {
+	max-width: 1014px;
+	margin: 20px auto 0;
+}
