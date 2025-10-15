@@ -7,7 +7,7 @@ export type Format = keyof typeof exporters;
 type Loader<D> = () => Promise<D>;
 
 function load<D>(url: string): Loader<D> {
-	return () => import(url);
+	return () => import(url).then((module) => module.default);
 }
 
 export const importers: Record<string, Loader<importer.Definition>> = {
