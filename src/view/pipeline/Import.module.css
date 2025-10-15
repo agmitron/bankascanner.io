@@ -19,9 +19,9 @@
 
 .selectContainer {
 	display: flex;
-	max-width: 354px;
 	width: 100%;
-	justify-content: space-between;
+	justify-content: center;
+	column-gap: 10px;
 	margin: 0 auto;
 	margin-top: 20px;
 }

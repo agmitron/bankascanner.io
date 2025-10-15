@@ -3,8 +3,8 @@ import { observer } from "mobx-react-lite";
 import QuestionCircle from "../../QuestionCircle.svg";
 import layoutStyles from "./Pipeline.module.css";
 import Import from "./1.Import";
-import Export from "./2.Export";
-import Review from "./3.Review";
+import Export from "./3.Export";
+import Review from "./2.Review";
 import { Step, WithTitle } from "./common";
 import store from "./Pipeline.store";
 

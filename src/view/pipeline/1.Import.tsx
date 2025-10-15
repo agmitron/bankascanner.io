@@ -17,7 +17,11 @@ const Import = observer(() => (
 			<Upload
 				accept=".pdf"
 				beforeUpload={() => false}
-				onChange={() => console.log("onchange")}
+				onChange={async (v) => {
+					// Do the job here.
+					//
+					// Read the file as Uint8Array and print to the console.
+				}}
 			>
 				<div className={styles.uploadText}>
 					Drop down your file (Supported format: .pdf)
@@ -29,7 +33,9 @@ const Import = observer(() => (
 			<Select
 				placeholder="Сhoose bank"
 				style={{ width: 128 }}
-				onChange={(value) => console.log("set selected bank")}
+				onChange={(value) => {
+					store.bank = value;
+				}}
 			>
 				{supportedBanks.map((bank) => (
 					<Option key={bank} value={bank}>
@@ -38,16 +44,11 @@ const Import = observer(() => (
 				))}
 			</Select>
 
-			<Select
-				placeholder="Version"
-				style={{ width: 98 }}
-				onChange={() => console.log("change version")}
+			<Button
+				type="primary"
+				onClick={() => store.next()}
+				disabled={!store.canContinue}
 			>
-				<Option value="1.0">Версия 1.0</Option>
-				<Option value="1.1">Версия 1.1</Option>
-			</Select>
-
-			<Button type="primary" onClick={() => store.next()}>
 				Continue
 			</Button>
 		</div>
