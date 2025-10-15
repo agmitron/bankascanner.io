@@ -1,14 +1,10 @@
 import { Button, Select, Typography } from "antd";
 import { observer } from "mobx-react-lite";
 import styles from "./Export.module.css";
-import store, { type ExportFormat } from "./Pipeline.store";
+import store from "./Pipeline.store";
+import { exporters } from "~/definitions";
 
 const Export = observer(() => {
-	const formatOptions: Array<{ value: ExportFormat; label: string }> = [
-		{ value: "csv", label: "CSV" },
-		{ value: "json", label: "JSON" },
-	];
-
 	return (
 		<>
 			<div className={styles.uploadArea}>
@@ -21,13 +17,13 @@ const Export = observer(() => {
 			</div>
 
 			<div className={styles.buttonContainer}>
-				<Select<ExportFormat>
-					value={store.exportFormat}
-					options={formatOptions}
-					onChange={(value) => store.setExportFormat(value)}
+				<Select
+					value={store.format}
+					options={Object.keys(exporters).map((f) => ({ label: f, value: f }))}
+					onChange={(value) => store.setFormat(value)}
 					style={{ width: 160 }}
 				/>
-				<Button type="primary" onClick={() => store.exportResult()}>
+				<Button type="primary" onClick={() => store.export()}>
 					Export
 				</Button>
 			</div>

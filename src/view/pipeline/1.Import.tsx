@@ -24,7 +24,7 @@ const Import = observer(() => {
 				const rawFile = (file.originFileObj ?? file) as File; // Fallback handles cases where originFileObj is not populated yet.
 				const arrayBuffer = await rawFile.arrayBuffer();
 				const uint8Array = new Uint8Array(arrayBuffer);
-				store.upload(uint8Array);
+				store.import(uint8Array);
 			} catch (error) {
 				console.error("Failed to read the uploaded file.", error);
 			} finally {
@@ -81,7 +81,7 @@ const Import = observer(() => {
 
 				<Button
 					type="primary"
-					onClick={() => store.scan()}
+					onClick={() => store.review()}
 					disabled={!store.canContinue}
 				>
 					Scan the statement

@@ -20,7 +20,7 @@ export class PipelineStore {
 	@observable accessor file: Uint8Array | null = null;
 	@observable accessor result: Result | null = null;
 	@observable accessor error: string | null = null;
-	@observable accessor format: Format = "csv";
+	@observable accessor format: Format = "json";
 
 	@action
 	async next() {
@@ -101,11 +101,40 @@ export class PipelineStore {
 
 		const load = exporters[this.format];
 		const exporter = await load();
+		debugger;
+
 		const result = await exporter.run(this.result.value);
 		if (result.isLeft()) {
 			this.error = result.value;
 		} else {
-			// download the file
+			// TODO: refactor, move to another func
+			if (typeof window === "undefined" || typeof document === "undefined") {
+				this.error = "Download is only supported in the browser.";
+				return notification.error({
+					message: "Download failed",
+					description: "Повторите выгрузку в браузере.",
+				});
+			}
+
+			const fileBytes = result.value;
+			const mimeTypes: Record<string, string> = {
+				json: "application/json",
+				csv: "text/csv",
+			};
+			const blob = new Blob([fileBytes], {
+				type: mimeTypes[this.format] ?? "application/octet-stream",
+			});
+			const url = URL.createObjectURL(blob);
+			try {
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = `bankascanner-export.${this.format}`;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			} finally {
+				URL.revokeObjectURL(url);
+			}
 		}
 
 		return notification.info({
