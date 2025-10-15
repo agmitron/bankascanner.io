@@ -1,7 +1,7 @@
-import { Button, Table, Typography } from "antd";
+import { Button, Select, Table, Typography } from "antd";
 import type { TableColumnsType } from "antd";
 import { observer } from "mobx-react-lite";
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import store from "./Pipeline.store";
 import styles from "./Review.module.css";
 import { nanoid } from "nanoid";
@@ -23,9 +23,7 @@ const renderEitherCell = <T,>(
 ): ReactNode => {
 	if (cell.isLeft()) {
 		return (
-			<Typography.Text type="danger">
-				{cell.value || "Ошибка"}
-			</Typography.Text>
+			<Typography.Text type="danger">{cell.value || "Ошибка"}</Typography.Text>
 		);
 	}
 
@@ -39,6 +37,9 @@ const renderEitherCell = <T,>(
 };
 
 const Review = observer(() => {
+	const [pageSize, setPageSize] = useState<number>(20);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+
 	const rows = useMemo<ReviewRow[]>(() => {
 		if (!store.result || store.result.isLeft()) {
 			return [];
@@ -69,6 +70,31 @@ const Review = observer(() => {
 
 		return rows;
 	}, [store.result]);
+
+	useEffect(() => {
+		const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+		if (currentPage > totalPages) {
+			setCurrentPage(totalPages);
+		}
+	}, [rows.length, pageSize, currentPage]);
+
+	const paginationConfig = useMemo(
+		() => ({
+			current: currentPage,
+			pageSize,
+			total: rows.length,
+			onChange: (page: number) => setCurrentPage(page),
+			showSizeChanger: false,
+		}),
+		[currentPage, pageSize, rows.length],
+	);
+
+	const pageSizeOptions = useMemo(() => [10, 20, 50, 100], []);
+
+	const handlePageSizeChange = (size: number) => {
+		setPageSize(size);
+		setCurrentPage(1);
+	};
 
 	const columns = useMemo<TableColumnsType<ReviewRow>>(
 		() => [
@@ -113,14 +139,22 @@ const Review = observer(() => {
 
 	return (
 		<>
-			<div className={styles.uploadArea}>
-				<h3>Обработка документа...</h3>
+			<div className={styles.paginationControls}>
+				<Typography.Text>Записей на странице:</Typography.Text>
+				<Select
+					value={pageSize}
+					style={{ width: 120 }}
+					options={pageSizeOptions.map((size) => ({
+						value: size,
+						label: `${size}`,
+					}))}
+					onChange={(value) => handlePageSizeChange(Number(value))}
+				/>
 			</div>
-
 			<Table<ReviewRow>
 				columns={columns}
 				dataSource={rows}
-				pagination={false}
+				pagination={paginationConfig}
 				scroll={{ x: true }}
 			/>
 
