@@ -1,24 +1,38 @@
-import { Button, Select } from "antd";
+import { Button, Select, Typography } from "antd";
 import { observer } from "mobx-react-lite";
 import styles from "./Export.module.css";
-import store from "./Pipeline.store";
+import store, { type ExportFormat } from "./Pipeline.store";
 
-const { Option } = Select;
+const Export = observer(() => {
+	const formatOptions: Array<{ value: ExportFormat; label: string }> = [
+		{ value: "csv", label: "CSV" },
+		{ value: "json", label: "JSON" },
+	];
 
-const Export = observer(() => (
-	<>
-		<div className={styles.uploadArea}>
-			<h3>Загрузка завершена!</h3>
-		</div>
+	return (
+		<>
+			<div className={styles.uploadArea}>
+				<div>
+					<Typography.Title level={3}>Загрузка завершена!</Typography.Title>
+					<Typography.Paragraph>
+						Выберите формат и нажмите Export, чтобы скачать результат.
+					</Typography.Paragraph>
+				</div>
+			</div>
 
-		<div className={styles.buttonContainer}>
-			<Select placeholder="Сhoose bank" style={{ width: 128 }}>
-				<Option value="csv">CSV</Option>
-				<Option value="json">JSON</Option>
-			</Select>
-			<Button type="primary">Download</Button>
-		</div>
-	</>
-));
+			<div className={styles.buttonContainer}>
+				<Select<ExportFormat>
+					value={store.exportFormat}
+					options={formatOptions}
+					onChange={(value) => store.setExportFormat(value)}
+					style={{ width: 160 }}
+				/>
+				<Button type="primary" onClick={() => store.exportResult()}>
+					Export
+				</Button>
+			</div>
+		</>
+	);
+});
 
 export default Export;

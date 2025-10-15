@@ -13,7 +13,7 @@
 
 .buttonContainer {
 	display: flex;
-	max-width: 221px;
+	max-width: 360px;
 	width: 100%;
 	justify-content: space-between;
 	margin: 0 auto;

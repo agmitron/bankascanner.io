@@ -4,26 +4,39 @@ import { importers, type Bank } from "~/definitions";
 import type { Result } from "bankascanner/importer";
 import { notification } from "antd";
 
+export type ExportFormat = "csv" | "json";
+
+const forth: Partial<Record<Step, Step>> = {
+	[Step.Import]: Step.Review,
+	[Step.Review]: Step.Export,
+};
+
+const back: Partial<Record<Step, Step>> = {
+	[Step.Export]: Step.Review,
+	[Step.Review]: Step.Import,
+};
+
 class PipelineStore {
 	@observable accessor step = Step.Import;
 	@observable accessor bank: Bank | null = null;
 	@observable accessor file: Uint8Array | null = null;
 	@observable accessor result: Result | null = null;
 	@observable accessor error: string | null = null;
+	@observable accessor exportFormat: ExportFormat = "csv";
 
 	@action
 	async next() {
-		const next = this.step + 1;
-		if (next < Object.keys(Step).length) {
+		const next = forth[this.step];
+		if (next) {
 			this.step = next;
 		}
 	}
 
 	@action
 	previous() {
-		const previous = this.step - 1;
-		if (previous > 0) {
-			this.step--;
+		const previous = back[this.step];
+		if (previous) {
+			this.step = previous;
 		}
 	}
 
@@ -32,6 +45,7 @@ class PipelineStore {
 		this.file = file;
 		this.error = null;
 		this.result = null;
+		this.exportFormat = "csv";
 	}
 
 	@action
@@ -39,6 +53,7 @@ class PipelineStore {
 		this.bank = b;
 		this.error = null;
 		this.result = null;
+		this.exportFormat = "csv";
 	}
 
 	@action
@@ -70,6 +85,26 @@ class PipelineStore {
 		}
 
 		this.next();
+	}
+
+	@action
+	setExportFormat(format: ExportFormat) {
+		this.exportFormat = format;
+	}
+
+	@action
+	exportResult() {
+		if (!this.result || this.result.isLeft()) {
+			return notification.warning({
+				message: "Nothing to export",
+				description: "Сканируйте выписку перед экспортом.",
+			});
+		}
+
+		return notification.info({
+			message: "Export placeholder",
+			description: `Экспорт в формате ${this.exportFormat.toUpperCase()} скоро будет доступен.`,
+		});
 	}
 
 	@computed
