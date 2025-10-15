@@ -60,9 +60,7 @@ const Import = observer(() => {
 				<Select
 					placeholder="Сhoose bank"
 					style={{ width: 128 }}
-					onChange={(value) => {
-						store.bank = value;
-					}}
+					onChange={(value) => store.setBank(value)}
 				>
 					{supportedBanks.map((bank) => (
 						<Option key={bank} value={bank}>
@@ -73,7 +71,7 @@ const Import = observer(() => {
 
 				<Button
 					type="primary"
-					onClick={() => store.next()}
+					onClick={() => store.scan()}
 					disabled={!store.canContinue}
 				>
 					Scan the statement

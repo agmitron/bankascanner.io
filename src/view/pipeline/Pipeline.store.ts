@@ -2,24 +2,17 @@ import { action, computed, observable } from "mobx";
 import { Step } from "./common";
 import { importers, type Bank } from "~/definitions";
 import type { Result } from "bankascanner/importer";
+import { notification } from "antd";
 
 class PipelineStore {
 	@observable accessor step = Step.Import;
 	@observable accessor bank: Bank | null = null;
 	@observable accessor file: Uint8Array | null = null;
 	@observable accessor result: Result | null = null;
+	@observable accessor error: string | null = null;
 
 	@action
 	async next() {
-		switch (this.step) {
-			case Step.Import:
-				await this.scan();
-				break;
-
-			default:
-				break;
-		}
-
 		const next = this.step + 1;
 		if (next < Object.keys(Step).length) {
 			this.step = next;
@@ -40,6 +33,11 @@ class PipelineStore {
 	}
 
 	@action
+	setBank(b: Bank) {
+		this.bank = b;
+	}
+
+	@action
 	async scan() {
 		if (!this.bank) {
 			throw new Error(
@@ -56,13 +54,23 @@ class PipelineStore {
 		const load = importers[this.bank];
 		const importer = await load();
 		this.result = await importer.run(this.file);
+
+		if (this.result.isLeft()) {
+			this.error = this.result.value;
+			return notification.error({
+				message: `Scan failed: ${this.result.value}`,
+				pauseOnHover: true,
+			});
+		}
+
+		this.next();
 	}
 
 	@computed
 	get canContinue(): boolean {
 		switch (this.step) {
 			case Step.Import: {
-				return this.bank != null && this.file != null;
+				return this.bank != null && this.file != null && this.error === null;
 			}
 		}
 
