@@ -1,6 +1,7 @@
-import { Button } from "antd";
+import { Button, Table, Typography } from "antd";
+import type { TableColumnsType } from "antd";
 import { observer } from "mobx-react-lite";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import store from "./Pipeline.store";
 import styles from "./Review.module.css";
 import { nanoid } from "nanoid";
@@ -14,16 +15,40 @@ interface Cell {
 	currency: Either<string, string>;
 }
 
+type ReviewRow = Cell & { key: string };
+
+const renderEitherCell = <T,>(
+	cell: Either<string, T>,
+	format?: (value: T) => ReactNode,
+): ReactNode => {
+	if (cell.isLeft()) {
+		return (
+			<Typography.Text type="danger">
+				{cell.value || "Ошибка"}
+			</Typography.Text>
+		);
+	}
+
+	const value = cell.value;
+
+	if (value === null || value === undefined) {
+		return null;
+	}
+
+	return format ? format(value) : (value as ReactNode);
+};
+
 const Review = observer(() => {
-	const rows = useMemo(() => {
+	const rows = useMemo<ReviewRow[]>(() => {
 		if (!store.result || store.result.isLeft()) {
 			return [];
 		}
 
-		const rows: Cell[] = [];
-		for (const outcome of store.result.value) {
+		const rows: ReviewRow[] = [];
+		for (const [index, outcome] of store.result.value.entries()) {
 			if (outcome.isRight()) {
 				rows.push({
+					key: `${index}-${nanoid()}`,
 					value: right(outcome.value.value),
 					date: right(outcome.value.date),
 					category: right(outcome.value.category),
@@ -32,6 +57,7 @@ const Review = observer(() => {
 				});
 			} else {
 				rows.push({
+					key: `${index}-${nanoid()}`,
 					value: left(outcome.value.fields?.value ?? ""),
 					date: left(outcome.value.fields?.date ?? ""),
 					category: left(outcome.value.fields?.category ?? ""),
@@ -40,13 +66,63 @@ const Review = observer(() => {
 				});
 			}
 		}
+
+		return rows;
 	}, [store.result]);
+
+	const columns = useMemo<TableColumnsType<ReviewRow>>(
+		() => [
+			{
+				title: "Дата",
+				dataIndex: "date",
+				key: "date",
+				render: (cell: ReviewRow["date"]) =>
+					renderEitherCell(cell, (value) =>
+						value instanceof Date ? value.toLocaleDateString() : String(value),
+					),
+			},
+			{
+				title: "Сумма",
+				dataIndex: "value",
+				key: "value",
+				align: "right",
+				render: (cell: ReviewRow["value"]) =>
+					renderEitherCell(cell, (value) => value.toLocaleString()),
+			},
+			{
+				title: "Категория",
+				dataIndex: "category",
+				key: "category",
+				render: (cell: ReviewRow["category"]) => renderEitherCell(cell),
+			},
+			{
+				title: "Комментарий",
+				dataIndex: "comment",
+				key: "comment",
+				render: (cell: ReviewRow["comment"]) => renderEitherCell(cell),
+			},
+			{
+				title: "Валюта",
+				dataIndex: "currency",
+				key: "currency",
+				render: (cell: ReviewRow["currency"]) => renderEitherCell(cell),
+			},
+		],
+		[],
+	);
 
 	return (
 		<>
 			<div className={styles.uploadArea}>
 				<h3>Обработка документа...</h3>
 			</div>
+
+			<Table<ReviewRow>
+				columns={columns}
+				dataSource={rows}
+				pagination={false}
+				scroll={{ x: true }}
+			/>
 
 			<div className={styles.buttonContainer}>
 				<Button onClick={store.previous}>Previous Page</Button>
