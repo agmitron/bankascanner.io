@@ -159,8 +159,8 @@ const Review = observer(() => {
 			/>
 
 			<div className={styles.buttonContainer}>
-				<Button onClick={store.previous}>Previous Page</Button>
-				<Button type="primary" onClick={store.next}>
+				<Button onClick={() => store.previous()}>Previous Page</Button>
+				<Button type="primary" onClick={() => store.next()}>
 					Continue
 				</Button>
 			</div>

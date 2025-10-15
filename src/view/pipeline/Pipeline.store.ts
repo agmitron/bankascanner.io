@@ -1,10 +1,8 @@
 import { action, computed, observable } from "mobx";
 import { Step } from "./common";
-import { importers, type Bank } from "~/definitions";
+import { exporters, Format, importers, type Bank } from "~/definitions";
 import type { Result } from "bankascanner/importer";
 import { notification } from "antd";
-
-export type ExportFormat = "csv" | "json";
 
 const forth: Partial<Record<Step, Step>> = {
 	[Step.Import]: Step.Review,
@@ -16,13 +14,13 @@ const back: Partial<Record<Step, Step>> = {
 	[Step.Review]: Step.Import,
 };
 
-class PipelineStore {
+export class PipelineStore {
 	@observable accessor step = Step.Import;
 	@observable accessor bank: Bank | null = null;
 	@observable accessor file: Uint8Array | null = null;
 	@observable accessor result: Result | null = null;
 	@observable accessor error: string | null = null;
-	@observable accessor exportFormat: ExportFormat = "csv";
+	@observable accessor format: Format = "csv";
 
 	@action
 	async next() {
@@ -41,11 +39,11 @@ class PipelineStore {
 	}
 
 	@action
-	upload(file: Uint8Array) {
+	import(file: Uint8Array) {
 		this.file = file;
 		this.error = null;
 		this.result = null;
-		this.exportFormat = "csv";
+		this.format = "csv";
 	}
 
 	@action
@@ -53,11 +51,11 @@ class PipelineStore {
 		this.bank = b;
 		this.error = null;
 		this.result = null;
-		this.exportFormat = "csv";
+		this.format = "csv";
 	}
 
 	@action
-	async scan() {
+	async review() {
 		this.error = null;
 
 		if (!this.bank) {
@@ -88,12 +86,12 @@ class PipelineStore {
 	}
 
 	@action
-	setExportFormat(format: ExportFormat) {
-		this.exportFormat = format;
+	setFormat(format: Format) {
+		this.format = format;
 	}
 
 	@action
-	exportResult() {
+	async export() {
 		if (!this.result || this.result.isLeft()) {
 			return notification.warning({
 				message: "Nothing to export",
@@ -101,9 +99,17 @@ class PipelineStore {
 			});
 		}
 
+		const load = exporters[this.format];
+		const exporter = await load();
+		const result = await exporter.run(this.result.value);
+		if (result.isLeft()) {
+			this.error = result.value;
+		} else {
+			// download the file
+		}
+
 		return notification.info({
-			message: "Export placeholder",
-			description: `Экспорт в формате ${this.exportFormat.toUpperCase()} скоро будет доступен.`,
+			message: "File downloaded.",
 		});
 	}
 
